@@ -31,10 +31,11 @@ class ElasticService {
     {
         try {
             let body = data.flatMap((doc, i) => {
-                if(doc.isError != 1 || !doc.isError) {
-                    return [{ index: { _index: index, _id: doc.hash } }, doc]
-                }
-                return [];
+                // if(doc.isError != 1 || !doc.isError) {
+                //     return [{ index: { _index: index, _id: doc.hash } }, doc]
+                // }
+                // return [];
+                return [{ index: { _index: index, _id: doc.hash } }, doc]
             })
             const bulkResponse = await client.bulk({ refresh: true, body })
             if (bulkResponse.errors) {
