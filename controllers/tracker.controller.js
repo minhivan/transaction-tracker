@@ -1,30 +1,87 @@
 let axios = require('axios');
 let elasticService = require('../services/elastic.service')
+const {isArray, isObject} = require("../helpers/utilities");
 require('dotenv').config()
 
-let countTransaction = 0;
-let pathPrefix = `/api?module=account&action=txlist&address=${process.env.WALLET_TO}&startblock=0&sort=asc&apikey=${process.env.BSCSCAN_API_KEY}`;
+let currentBlockWallet = 0;
+let currentBlockContract = 17048596;
+let pathPrefixSmartContract = `/api?module=account&action=txlist&address=${process.env.WALLET_MASTER}&startblock=${currentBlockWallet}&sort=asc&apikey=${process.env.BSCSCAN_API_KEY}`;
+let pathPrefixWallet = `/api?module=account&action=txlist&address=${process.env.WALLET_TO}&startblock=${currentBlockContract}&sort=asc&apikey=${process.env.BSCSCAN_API_KEY}`;
 
 // init recursive call
 const getData = async() => {
-    setTimeout(async () => {
-        try {
-            const path = process.env.BSCSCAN_URL + pathPrefix;
+    try {
+        const path = process.env.BSCSCAN_URL + pathPrefixWallet;
+        let response = await  axios.get(path);
+        let data = await response.data;
 
-            let response = await  axios.get(path);
-            let data = await response.data;
-            if(countTransaction < data.result.length) {
-                countTransaction = data.result.length;
-                // import
-                console.log("Import data")
-                elasticService.create_bulk('transaction_tracker', data.result)
-            }
-        } catch (e) {
-            console.log(e.message)
+        if (!isArray(data.result)){
+            throw new Error("Empty data");
         }
-        // Recursive call
-        return getData()
-    }, process.env.BLOCK_PER_SECOND * 1000)
+
+        const latestRecords = data.result[data.result.length -1];
+
+        if (!isObject(latestRecords)) {
+            throw new Error("Wrong records");
+        }
+
+        if (parseInt(latestRecords.blockNumber) !== currentBlockWallet) {
+            currentBlockWallet = parseInt(latestRecords.blockNumber);
+            // import
+            console.log(" [x] Import data smart contract tracker")
+            elasticService.create_bulk('transaction_tracker', data.result)
+        }
+        await new Promise(resolve => setTimeout(resolve, process.env.BLOCK_PER_SECOND * 1000))
+
+    } catch (e) {
+        console.log(e.message)
+        await getData();
+    }
+    await getData(); // recursive
 }
-module.exports = getData
+
+
+
+// init recursive call
+const getSmartContractData = async() => {
+    // if (count > 10)
+    //     process.exit(1);
+    try {
+        const path = process.env.BSCSCAN_URL + pathPrefixSmartContract;
+        let response = await  axios.get(path);
+        let data = await response.data;
+
+        if (!isArray(data.result)){
+            throw new Error("Empty data");
+        }
+
+        const latestRecords = data.result[data.result.length -1];
+
+        if (!isObject(latestRecords)) {
+            throw new Error("Wrong records");
+        }
+
+        if (parseInt(latestRecords.blockNumber) !== currentBlockContract) {
+            currentBlockContract = parseInt(latestRecords.blockNumber);
+
+            // import
+            console.log(" [x] Import data smart contract tracker")
+            elasticService.create_bulk('transaction_smart_contract_tracker', data.result)
+        }
+        await new Promise(resolve => setTimeout(resolve, process.env.BLOCK_PER_SECOND * 1000))
+    } catch (e) {
+        console.log(e.message);
+        await getSmartContractData();
+    }
+   // console.timeEnd("answer time");
+    await getSmartContractData();
+}
+
+
+
+
+module.exports = {
+    getSmartContractData,
+    getData
+}
 
