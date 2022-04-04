@@ -69,7 +69,6 @@ const getSmartContractData = async() => {
                 let methodHash = Web3EthAbi.encodeFunctionSignature('claim(uint64)');
                 return value.input.includes(methodHash);
             })
-            console.log(filtered)
             // import
             console.log(" [x] Import data smart contract tracker")
             elasticService.create_bulk('transaction_smart_contract_tracker', data.result);
