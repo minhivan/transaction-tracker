@@ -4,7 +4,7 @@ const {isArray, isObject} = require("../helpers/utilities");
 require('dotenv').config()
 
 let currentBlockWallet = 0;
-let currentBlockContract = 17048596;
+let currentBlockContract = 0;
 let pathPrefixSmartContract = `/api?module=account&action=txlist&address=${process.env.WALLET_MASTER}&startblock=${currentBlockWallet}&sort=asc&apikey=${process.env.BSCSCAN_API_KEY}`;
 let pathPrefixWallet = `/api?module=account&action=txlist&address=${process.env.WALLET_TO}&startblock=${currentBlockContract}&sort=asc&apikey=${process.env.BSCSCAN_API_KEY}`;
 
