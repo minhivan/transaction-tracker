@@ -2,6 +2,8 @@ let axios = require('axios');
 let elasticService = require('../services/elastic.service')
 const {isArray, isObject} = require("../helpers/utilities");
 require('dotenv').config()
+const Web3EthAbi = require('web3-eth-abi');
+
 
 let currentBlockWallet = 0;
 let currentBlockContract = 0;
@@ -63,10 +65,15 @@ const getSmartContractData = async() => {
 
         if (parseInt(latestRecords.blockNumber) !== currentBlockContract) {
             currentBlockContract = parseInt(latestRecords.blockNumber);
-
+            let filtered = data.result.filter(function(value, index, arr) {
+                let methodHash = Web3EthAbi.encodeFunctionSignature('claim(uint64)');
+                return value.input.includes(methodHash);
+            })
+            console.log(filtered)
             // import
             console.log(" [x] Import data smart contract tracker")
-            elasticService.create_bulk('transaction_smart_contract_tracker', data.result)
+            elasticService.create_bulk('transaction_smart_contract_tracker', data.result);
+            elasticService.create_bulk('transaction_smart_contract_claim_tracker', filtered);
         }
         await new Promise(resolve => setTimeout(resolve, process.env.BLOCK_PER_SECOND * 1000))
     } catch (e) {
