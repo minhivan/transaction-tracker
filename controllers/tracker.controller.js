@@ -30,7 +30,7 @@ const getData = async() => {
         if (parseInt(latestRecords.blockNumber) !== currentBlockWallet) {
             currentBlockWallet = parseInt(latestRecords.blockNumber);
             // import
-            console.log(" [x] Import data smart contract tracker")
+            console.log(" [x] Import data wallet tracker")
             elasticService.create_bulk('transaction_tracker', data.result)
         }
         await new Promise(resolve => setTimeout(resolve, process.env.BLOCK_PER_SECOND * 1000))
