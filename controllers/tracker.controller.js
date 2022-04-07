@@ -12,6 +12,7 @@ let pathPrefixWallet = `/api?module=account&action=txlist&address=${process.env.
 
 // init recursive call
 const getData = async() => {
+    await new Promise(resolve => setTimeout(resolve, process.env.BLOCK_PER_SECOND * 1000))
     try {
         const path = process.env.BSCSCAN_URL + pathPrefixWallet;
         let response = await  axios.get(path);
@@ -33,13 +34,12 @@ const getData = async() => {
             console.log(" [x] Import data wallet tracker")
             elasticService.create_bulk('transaction_tracker', data.result)
         }
-        await new Promise(resolve => setTimeout(resolve, process.env.BLOCK_PER_SECOND * 1000))
-
+        await getData(); // recursive
     } catch (e) {
         console.log(e.message)
         await getData();
     }
-    await getData(); // recursive
+
 }
 
 
@@ -48,6 +48,8 @@ const getData = async() => {
 const getSmartContractData = async() => {
     // if (count > 10)
     //     process.exit(1);
+    await new Promise(resolve => setTimeout(resolve, process.env.BLOCK_PER_SECOND * 1000));
+
     try {
         const path = process.env.BSCSCAN_URL + pathPrefixSmartContract;
         let response = await  axios.get(path);
@@ -74,13 +76,13 @@ const getSmartContractData = async() => {
             elasticService.create_bulk('transaction_smart_contract_tracker', data.result);
             elasticService.create_bulk('transaction_smart_contract_claim_tracker', filtered);
         }
-        await new Promise(resolve => setTimeout(resolve, process.env.BLOCK_PER_SECOND * 1000))
+        // console.timeEnd("answer time");
+        await getSmartContractData();
     } catch (e) {
         console.log(e.message);
         await getSmartContractData();
     }
-   // console.timeEnd("answer time");
-    await getSmartContractData();
+
 }
 
 
