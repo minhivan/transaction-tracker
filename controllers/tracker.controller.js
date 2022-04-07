@@ -15,7 +15,7 @@ const getData = async() => {
     if (count_process_1 > 250)
         process.exit(1);
 
-    await new Promise(resolve => setTimeout(resolve, process.env.BLOCK_PER_SECOND * 1000))
+    await new Promise(resolve => setTimeout(resolve, process.env.BLOCK_PER_SECOND))
     try {
         console.log(" [*] Starting tracker data from wallet");
         let path = `/api?module=account&action=txlist&address=${process.env.WALLET_TO}&startblock=${currentBlockContract}&sort=asc&apikey=${process.env.BSCSCAN_API_KEY}`;
@@ -57,7 +57,7 @@ const getSmartContractData = async() => {
     if (count_process_2 > 250)
         process.exit(1);
 
-    await new Promise(resolve => setTimeout(resolve, process.env.BLOCK_PER_SECOND * 1000));
+    await new Promise(resolve => setTimeout(resolve, process.env.BLOCK_PER_SECOND));
     try {
         console.log(" [*] Starting tracker data from smart contract");
         let path = `/api?module=account&action=txlist&address=${process.env.WALLET_MASTER}&startblock=${currentBlockWallet}&sort=asc&apikey=${process.env.BSCSCAN_API_KEY}`;
