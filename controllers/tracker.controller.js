@@ -12,7 +12,7 @@ let count_process_2 = 0;
 
 // init recursive call
 const getData = async() => {
-    if (count_process_1 > 500)
+    if (count_process_1 > 250)
         process.exit(1);
 
     await new Promise(resolve => setTimeout(resolve, process.env.BLOCK_PER_SECOND * 1000))
@@ -54,7 +54,7 @@ const getData = async() => {
 
 // init recursive call
 const getSmartContractData = async() => {
-    if (count_process_2 > 500)
+    if (count_process_2 > 250)
         process.exit(1);
 
     await new Promise(resolve => setTimeout(resolve, process.env.BLOCK_PER_SECOND * 1000));
