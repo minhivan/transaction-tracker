@@ -61,7 +61,8 @@ class ElasticService {
                 console.log(erroredDocuments)
             }
             const count = await client.count({ index: index })
-            console.log(count)
+            console.log(count);
+            console.log(` [x] Imported data to ${index}`);
         } catch (e) {
             console.log(e)
             return false
