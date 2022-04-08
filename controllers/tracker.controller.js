@@ -37,8 +37,9 @@ const getData = async() => {
         if (Number(latestRecords.blockNumber) !== Number(currentBlockWallet)) {
             currentBlockWallet = Number(latestRecords.blockNumber);
             // import
+            let filtered = data.result.filter(el => el.to === process.env.WALLET_TO)
             console.log(" [x] Starting import data to elasticsearch");
-            elasticService.create_bulk('transaction_tracker', data.result)
+            elasticService.create_bulk('transaction_tracker', filtered)
         }
         console.log(` [x] Done process tracker - ${count_process_1} times`);
         count_process_1 ++;
